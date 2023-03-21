@@ -28,7 +28,6 @@ target_sources(DEVICE_COMMON_FILES PUBLIC
     ${PORT_DIR}/device_common/device_common.c
     ${PORT_DIR}/device_common/system_common.c
     ${PORT_DIR}/device_common/logger.c
-    ${PORT_DIR}/device_common/ymodem.c
 )
 
 target_include_directories(DEVICE_COMMON_FILES PUBLIC

@@ -1,0 +1,26 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "cwd": "${workspaceRoot}",
+            "executable": "build\\boot\\rp2040_wiznet_eaas_boot.elf",
+            "name": "Debug with OpenOCD",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "configFiles": [
+                "build_tools\\OpenOCD-20230202-0.12.0\\share\\openocd\\scripts\\interface\\picoprobe.cfg",
+                "build_tools\\OpenOCD-20230202-0.12.0\\share\\openocd\\scripts\\target\\rp2040.cfg"
+
+            ],
+            "serverpath": "build_tools\\OpenOCD-20230202-0.12.0\\bin\\openocd.exe",
+            "searchDir": ["build_tools\\OpenOCD-20230202-0.12.0\\share\\openocd\\scripts"],
+            "runToEntryPoint": "main",
+            "showDevDebugOutput": "none",
+            "postRestartCommands": [
+                "break main",
+                "continue"
+              ]
+        }
+    ]
+}

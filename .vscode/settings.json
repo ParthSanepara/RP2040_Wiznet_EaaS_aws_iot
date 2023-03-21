@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "port_common.h": "c",
+        "flash.h": "c",
+        "resets.h": "c",
+        "semphr.h": "c",
+        "device_common.h": "c"
+    },
+    "cmake.buildBeforeRun": true,
+    "C_Cpp.default.configurationProvider": "ms-vscode.makefile-tools"
+}

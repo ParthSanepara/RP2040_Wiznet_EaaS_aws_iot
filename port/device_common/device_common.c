@@ -3,15 +3,6 @@
 
 void print_boot_info(void)
 {
-    TRACE_DEBUG("===========================================================");    
-
-    TRACE_DEBUG("##      ## #### ######## ##    ## ######## ########"); 
-    TRACE_DEBUG("##  ##  ##  ##       ##  ###   ## ##          ##   ");
-    TRACE_DEBUG("##  ##  ##  ##      ##   ####  ## ##          ##   "); 
-    TRACE_DEBUG("##  ##  ##  ##     ##    ## ## ## ######      ##   "); 
-    TRACE_DEBUG("##  ##  ##  ##    ##     ##  #### ##          ##   "); 
-    TRACE_DEBUG("##  ##  ##  ##   ##      ##   ### ##          ##   "); 
-    TRACE_DEBUG(" ###  ###  #### ######## ##    ## ########    ##   "); 
     TRACE_DEBUG("===========================================================");
     TRACE_DEBUG("Bootloader : %s",BOOTLOADER_INFO);
     TRACE_DEBUG("Bootloader Ver : %d . %d . %d",BOOTLOADER_VERSION_MAJOR, BOOTLOADER_VERSION_MINOR, BOOTLOADER_VERSION_PATCH);

@@ -5,6 +5,7 @@
 #include "flash_control.h"
 #include "system_common.h"
 
+#define JUMP_APP_TIMEOUT_MS             1000
 
 #define KEY_VALUE_BOOT_DOWN_ENTER       '!'
 
@@ -52,16 +53,27 @@ int main()
     load_flash_common_config_info(&appCommon);
 
     startTimeoutMs = get_time_ms();
+    TRACE_MSG("Jump to App after %ldms", (uint32_t)JUMP_APP_TIMEOUT_MS);
     while(1)
     {
-        DELAY_MS_NON_OS(100);
-
         currentTimeoutMs = get_time_ms();
-        if( (currentTimeoutMs - startTimeoutMs) > 10000 )
+        if( (currentTimeoutMs - startTimeoutMs) > JUMP_APP_TIMEOUT_MS )
         {
             break;
         }
-        
+        else if( (currentTimeoutMs - startTimeoutMs) > 100 )
+        {
+            TRACE_MSG_WITHOUT_NL("\b\b\b\b\b\b\b\b%ldms", (currentTimeoutMs - startTimeoutMs));
+        }
+
+        if(appCommon.DEVICE_INFO.START_FW_OTA_STATUS == START_FW_OTA_ENABLE)
+        {
+            // Start OTA
+            TRACE_DEBUG("Start OTA");
+        }
+
+
+        // Wait 1MS
         ch = getchar_timeout_us(1000);
         if(ch < 0)
         {
@@ -84,7 +96,7 @@ int main()
         
     }
 
-    TRACE_DEBUG("Jump Addr = 0x%08X", FLASH_APP_START_ADDR);
+    TRACE_DEBUG("\r\nJump Addr = 0x%08X", FLASH_APP_START_ADDR);
     DELAY_MS_NON_OS(100);
 
     disable_interrupts();
