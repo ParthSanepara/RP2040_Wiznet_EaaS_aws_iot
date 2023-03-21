@@ -10,14 +10,17 @@
  * ----------------------------------------------------------------------------------------------------
  */
 #include <stdio.h>
-#include <FreeRTOS.h>
+//#include <FreeRTOS.h>
+
+#include "wizchip_conf.h"
+#include "w5x00_spi.h"
+
+#include "pico/binary_info.h"
+#include "pico/critical_section.h"
 
 #include "hardware/spi.h"
 #include "hardware/gpio.h"
 
-#include "pico/critical_section.h"
-#include "wizchip_conf.h"
-#include "w5x00_spi.h"
 
 /**
  * ----------------------------------------------------------------------------------------------------

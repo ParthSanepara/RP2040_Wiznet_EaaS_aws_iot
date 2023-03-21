@@ -49,6 +49,22 @@ if(NOT DEFINED FREERTOS_DIR)
     message(STATUS "FREERTOS_DIR = ${FREERTOS_DIR}")
 endif()
 
+if(NOT DEFINED AWS_SDK_DIR)
+    set(AWS_SDK_DIR ${CMAKE_SOURCE_DIR}/libraries/aws-iot-device-sdk-embedded-C)
+    message(STATUS "AWS_SDK_DIR = ${AWS_SDK_DIR}")
+endif()
+
+if(NOT DEFINED MBEDTLS_DIR)
+    #set(MBEDTLS_DIR ${CMAKE_SOURCE_DIR}/libraries/mbedtls)
+    set(MBEDTLS_DIR ${CMAKE_SOURCE_DIR}/libraries/aws-iot-device-sdk-embedded-C/libraries/3rdparty/mbedtls)
+    message(STATUS "MBEDTLS_DIR = ${MBEDTLS_DIR}")
+endif()
+
+if(NOT DEFINED TINY_CBOR_DIR)
+    set(TINY_CBOR_DIR ${CMAKE_SOURCE_DIR}/libraries/aws-iot-device-sdk-embedded-C/libraries/3rdparty/tinycbor)
+    message(STATUS "TINY_CBOR_DIR = ${TINY_CBOR_DIR}")
+endif()
+
 if(NOT DEFINED WIZNET_DIR)
     set(WIZNET_DIR ${CMAKE_SOURCE_DIR}/libraries/ioLibrary_Driver)
     message(STATUS "WIZNET_DIR = ${WIZNET_DIR}")
@@ -64,11 +80,18 @@ if(NOT DEFINED BOOT_DIR)
     message(STATUS "BOOT_DIR = ${BOOT_DIR}")
 endif()
 
+# Turn off mbedtls test mode 
+set(ENABLE_PROGRAMS OFF CACHE BOOL "Build mbedtls programs")
+set(ENABLE_TESTING OFF CACHE BOOL "Build mbedtls testing")
+add_definitions(-DMBEDTLS_CONFIG_FILE="${PORT_DIR}/mbedtls/inc/ssl_config.h")
+add_definitions(-DSET_TRUSTED_CERT_IN_SAMPLES)
 
 # Add libraries in subdirectories
 add_subdirectory(${CMAKE_SOURCE_DIR}/libraries)
 add_subdirectory(${PICO_SDK_DIR})
+add_subdirectory(${MBEDTLS_DIR})
 add_subdirectory(${PORT_DIR})
+#add_subdirectory(${APPS_DIR})
 add_subdirectory(${BOOT_DIR})
 
 # Set compile options

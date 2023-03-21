@@ -4,7 +4,9 @@
         "flash.h": "c",
         "resets.h": "c",
         "semphr.h": "c",
-        "device_common.h": "c"
+        "device_common.h": "c",
+        "spi.h": "c",
+        "custom_transport_interface.h": "c"
     },
     "cmake.buildBeforeRun": true,
     "C_Cpp.default.configurationProvider": "ms-vscode.makefile-tools"

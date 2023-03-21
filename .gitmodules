@@ -1,9 +1,6 @@
 [submodule "libraries/pico-sdk"]
 	path = libraries/pico-sdk
 	url = https://github.com/raspberrypi/pico-sdk.git
-[submodule "libraries/aws-iot-device-sdk-embedded-C"]
-	path = libraries/aws-iot-device-sdk-embedded-C
-	url = https://github.com/aws/aws-iot-device-sdk-embedded-C.git
 [submodule "libraries/FreeRTOS-Kernel"]
 	path = libraries/FreeRTOS-Kernel
 	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
