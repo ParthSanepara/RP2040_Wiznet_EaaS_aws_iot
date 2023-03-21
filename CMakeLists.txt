@@ -75,6 +75,11 @@ if(NOT DEFINED PORT_DIR)
     message(STATUS "PORT_DIR = ${PORT_DIR}")
 endif()
 
+if(NOT DEFINED APP_DIR)
+    set(APP_DIR ${CMAKE_SOURCE_DIR}/app)
+    message(STATUS "APP_DIR = ${APP_DIR}")
+endif()
+
 if(NOT DEFINED BOOT_DIR)
     set(BOOT_DIR ${CMAKE_SOURCE_DIR}/boot)
     message(STATUS "BOOT_DIR = ${BOOT_DIR}")
@@ -91,7 +96,7 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/libraries)
 add_subdirectory(${PICO_SDK_DIR})
 add_subdirectory(${MBEDTLS_DIR})
 add_subdirectory(${PORT_DIR})
-#add_subdirectory(${APPS_DIR})
+add_subdirectory(${APP_DIR})
 add_subdirectory(${BOOT_DIR})
 
 # Set compile options
