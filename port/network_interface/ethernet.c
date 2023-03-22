@@ -5,6 +5,7 @@
 #include "timer.h"
 #include "logger.h"
 #include "device_common.h"
+#include "os_common.h"
 
 /* Buffer */
 #define ETHERNET_BUF_MAX_SIZE (1024 * 2)
@@ -98,7 +99,7 @@ bool dhcp_process(wiz_NetInfo *pNetInfo)
     startTimeStamp = get_time_ms();
     while(1)
     {
-        DELAY_MS(100);
+        OS_DELAY_MS(100);
 
         link = wizphy_getphylink();
         if( link == PHY_LINK_OFF )
@@ -135,7 +136,7 @@ bool dhcp_process(wiz_NetInfo *pNetInfo)
             TRACE_WARN("Fail to DHCP. Retry Count : %d",dhcpRetryCnt);
             DHCP_stop();
             TRACE_DEBUG("Wait 500MS");
-            DELAY_MS(500);
+            OS_DELAY_MS(500);
             continue;
         }
         else if(retval == DHCP_IP_LEASED)
@@ -176,7 +177,7 @@ int8_t get_ipaddr_from_dns(uint8_t *domain, uint8_t *ip_from_dns, uint8_t *buf, 
     startTimeStamp = get_time_ms();
     while(1)
     {
-        DELAY_MS(100);
+        OS_DELAY_MS(100);
         
         currentTimeStamp = get_time_ms();
 

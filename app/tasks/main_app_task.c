@@ -4,6 +4,7 @@
 #include "flash_control.h"
 #include "system_common.h"
 #include "stdlib.h"
+#include "os_common.h"
 
 // Temperary
 #include "iot_jobs_job_list.h"
@@ -79,7 +80,7 @@ void main_app_task(void *pParam)
                     }
                     
                     TRACE_DEBUG_WITHOUT_NL("#");
-                    DELAY_MS(1000);
+                    OS_DELAY_MS(1000);
                 }while(pAppCommon->isWizChipLinkUp == false || pAppCommon->isDhcpDone == false);
             }
             
@@ -198,6 +199,6 @@ void main_app_task(void *pParam)
         }
 
 
-        DELAY_MS(10);
+        OS_DELAY_MS(10);
     }
 }

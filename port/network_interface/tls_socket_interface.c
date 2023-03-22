@@ -1,4 +1,5 @@
 #include "tls_socket_interface.h"
+#include "os_common.h"
 #include "device_common.h"
 
 int tls_random_callback(void *p_rng, unsigned char *output, size_t output_len)
@@ -194,7 +195,7 @@ int tls_socket_connect_timeout(tlsContext_t *tlsContext, char *addr, unsigned in
             return (-1);
         }
 
-        DELAY_MS(10);
+        OS_DELAY_MS(10);
     }
 
     TRACE_DEBUG("[ Ciphersuite is %s ]", mbedtls_ssl_get_ciphersuite(&tlsContext->ssl));

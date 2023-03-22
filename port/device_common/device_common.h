@@ -11,11 +11,6 @@
 #include <ctype.h>
 #include <stddef.h>
 
-#ifdef INC_FREERTOS_H
-    #include <FreeRTOS.h>
-    #include <task.h>
-    #include <semphr.h>
-#endif
 
 //#include "port_common.h"
 
@@ -36,16 +31,8 @@
 #define APPLICATION_VERSION_MINOR                       0
 #define APPLICATION_VERSION_PATCH                       0
 
-/** FreeRTOS Delay wrapping */
-#ifdef INC_FREERTOS_H
-    #define DELAY_S(x)          vTaskDelay(( x * 1000))
-    #define DELAY_MS(x)         vTaskDelay(x)
-#else
-    #define DELAY_S(x)          sleep_ms(( x * 1000))
-    #define DELAY_MS(x)         sleep_ms(x)
-#endif
-
-#define DELAY_MS_NON_OS(x)  sleep_ms(x) 
+#define DELAY_S(x)          sleep_ms(( x * 1000))
+#define DELAY_MS(x)         sleep_ms(x)
 
 #define MEMSET(x, y, z)     memset(x, y, z)
 #define MEMCMP(x, y, z)     memcmp(x, y, z)

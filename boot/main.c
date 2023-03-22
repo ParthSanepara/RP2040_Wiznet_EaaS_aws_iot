@@ -69,7 +69,7 @@ int main()
         if(appCommon.DEVICE_INFO.START_FW_OTA_STATUS == START_FW_OTA_ENABLE)
         {
             // Start OTA
-            TRACE_DEBUG("Start OTA");
+            printf("Start OTA\r\n");
         }
 
 
@@ -82,7 +82,7 @@ int main()
 
         if(ch == KEY_VALUE_BOOT_DOWN_ENTER)
         {
-            TRACE_DEBUG("Get C");
+            printf("Get C\r\n");
         }
         else if(ch == '1')
         {
@@ -96,7 +96,7 @@ int main()
         
     }
 
-    TRACE_DEBUG("\r\nJump Addr = 0x%08X", FLASH_APP_START_ADDR);
+    printf("\r\nJump Addr = 0x%08X\r\n\r\n", FLASH_APP_START_ADDR);
     DELAY_MS_NON_OS(100);
 
     disable_interrupts();

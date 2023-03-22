@@ -1,7 +1,9 @@
-#include "http_interface.h"
-
-#include "ethernet.h"
 #include <string.h>
+
+#include "os_common.h"
+
+#include "http_interface.h"
+#include "ethernet.h"
 #include "device_common.h"
 
 NetworkContext_t g_http_network_context;
@@ -112,7 +114,7 @@ int32_t http_read(NetworkContext_t *pNetworkContext, void *pBuffer, size_t bytes
         {
             break;
         }
-        DELAY_MS(10);
+        OS_DELAY_MS(10);
     } while ((get_time_ms() - tickStart) <= HTTP_TIMEOUT);
 
     return size;

@@ -1,4 +1,5 @@
 #include "idle_task.h"
+#include "os_common.h"
 #include "config.h"
 #include "ethernet.h"
 #include "mqtt_interface.h"
@@ -64,6 +65,6 @@ void idle_task(void *pParam)
 
 
 
-        DELAY_MS(100);
+        OS_DELAY_MS(100);
     }
 }

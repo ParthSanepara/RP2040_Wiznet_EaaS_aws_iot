@@ -6,7 +6,11 @@
         "semphr.h": "c",
         "device_common.h": "c",
         "spi.h": "c",
-        "custom_transport_interface.h": "c"
+        "custom_transport_interface.h": "c",
+        "freertos.h": "c",
+        "rp2040.h": "c",
+        "core_cm0plus.h": "c",
+        "w5x00_spi.h": "c"
     },
     "cmake.buildBeforeRun": true,
     "C_Cpp.default.configurationProvider": "ms-vscode.makefile-tools"

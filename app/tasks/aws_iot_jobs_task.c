@@ -3,6 +3,7 @@
 #include "iot_jobs_job_list.h"
 #include "device_common.h"
 #include "system_common.h"
+#include "os_common.h"
 
 #define IOT_JOBS_GET_JOB_TIME_MS                10000
 #define IOT_JOBS_START_JOB_DOCUMENT_TIME_MS      1000
@@ -23,7 +24,7 @@ void aws_iot_jobs_task(void *pParam)
     APP_COMMON_t *pAppCommon = (APP_COMMON_t *)pParam;
 
     do{
-        DELAY_MS(1000);
+        OS_DELAY_MS(1000);
     }while(pAppCommon->isWizChipLinkUp == false || pAppCommon->isDhcpDone == false);
 
     TRACE_DEBUG("AWS IoT Jobs Task");
@@ -32,7 +33,7 @@ void aws_iot_jobs_task(void *pParam)
 
     while(1)
     {
-        DELAY_MS(100);
+        OS_DELAY_MS(100);
 
         if(pAppCommon->isRunAwsIotJobs == false)
         {
@@ -54,7 +55,7 @@ void aws_iot_jobs_task(void *pParam)
             {
                 iot_jobs_close_procedure(&pAppCommon->DEVICE_INFO);
                 pAppCommon->AWS_IOT_JOBS_STATUS = AWS_IOT_JOBS_DISCONNECTED;
-                DELAY_MS(1000);
+                OS_DELAY_MS(1000);
                 continue;
             }
 

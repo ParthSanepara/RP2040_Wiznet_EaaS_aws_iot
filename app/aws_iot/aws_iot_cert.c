@@ -1,4 +1,5 @@
 #include "aws_iot_cert.h"
+#include "os_common.h"
 
 const uint8_t AWS_IOT_ROOT_CA[] =                                               \
     "-----BEGIN CERTIFICATE-----\r\n"                                           \

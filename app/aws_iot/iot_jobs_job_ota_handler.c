@@ -1,4 +1,5 @@
 #include "iot_jobs_job_ota_handler.h"
+#include "os_common.h"
 #include "http_interface.h"
 #include "ethernet.h"
 #include "crc16.h"
@@ -130,11 +131,11 @@ int32_t ota_http_send_request_callback(TransportInterface_t *pTransportInterface
 
         TRACE_DEBUG("Temp Flash Erase for OTA");
         erase_flash_ota_binary(response.contentLength);
-        DELAY_MS(1000);
+        OS_DELAY_MS(1000);
 
         while (1)
         {
-            DELAY_MS(10);
+            OS_DELAY_MS(10);
             memset(tempOtaBinaryBuffer, 0, HTTP_BUF_MAX_SIZE);
             
             if( isFirstRecv == true )

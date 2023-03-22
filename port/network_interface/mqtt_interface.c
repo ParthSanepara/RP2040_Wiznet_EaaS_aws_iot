@@ -1,4 +1,7 @@
 #include "mqtt_interface.h"
+
+#include "os_common.h"
+
 #include "device_common.h"
 #include "transport_interface.h"
 
@@ -484,7 +487,7 @@ int32_t mqtt_read(NetworkContext_t *pNetworkContext, void *pBuffer, size_t bytes
             break;
         }
         //sleep_ms(10);
-        DELAY_MS(10);
+        OS_DELAY_MS(10);
     } while ((get_time_ms() - tickStart) <= MQTT_READ_TIMEOUT_MS);
 
     return size;

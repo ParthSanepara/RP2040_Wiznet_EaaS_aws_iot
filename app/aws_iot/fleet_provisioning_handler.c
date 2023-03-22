@@ -1,4 +1,5 @@
 #include "fleet_provisioning_handler.h"
+#include "os_common.h"
 #include "tls_socket_interface.h"
 #include "mqtt_interface.h"
 #include "ethernet.h"
@@ -215,7 +216,7 @@ bool waitRecvCreateCertAndKeyAcceptMsg(uint32_t timeoutMs)
             break;
         }
         
-        DELAY_MS(100);
+        OS_DELAY_MS(100);
     }
 
     return true;
@@ -244,7 +245,7 @@ bool waitRegisterThingAccepttMsg(uint32_t timeoutMs)
             break;
         }
         
-        DELAY_MS(100);
+        OS_DELAY_MS(100);
     }
 
     return true;

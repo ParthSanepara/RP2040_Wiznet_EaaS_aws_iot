@@ -3,7 +3,7 @@
     "configurations": [
         {
             "cwd": "${workspaceRoot}",
-            "executable": "build\\boot\\rp2040_wiznet_eaas_boot.elf",
+            "executable": "build\\app\\rp2040_wiznet_eaas.elf",
             "name": "Debug with OpenOCD",
             "request": "launch",
             "type": "cortex-debug",

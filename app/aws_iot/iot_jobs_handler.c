@@ -1,4 +1,6 @@
 #include "iot_jobs_handler.h"
+#include "system_common.h"
+#include "os_common.h"
 #include "tls_socket_interface.h"
 #include "mqtt_interface.h"
 #include "ethernet.h"
@@ -524,7 +526,7 @@ bool iot_jobs_mqtt_wait_recv_get_job(uint32_t timeoutMs)
             break;
         }
         
-        DELAY_MS(100);
+        OS_DELAY_MS(100);
     }
 
     TRACE_DEBUG("Success. Recv Get Job Accepted");
@@ -555,7 +557,7 @@ bool iot_jobs_mqtt_wait_recv_start_next_job(uint32_t timeoutMs)
             break;
         }
         
-        DELAY_MS(100);
+        OS_DELAY_MS(100);
     }
 
     TRACE_DEBUG("Success. Recv Start Next Job Accepted");
@@ -586,7 +588,7 @@ bool iot_jobs_mqtt_wait_recv_job_update_accepted(uint32_t timeoutMs)
             break;
         }
         
-        DELAY_MS(100);
+        OS_DELAY_MS(100);
     }
     
     TRACE_DEBUG("Success. Recv Job Update Accepted");
