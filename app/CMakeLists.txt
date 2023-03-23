@@ -6,6 +6,7 @@ add_executable(${TARGET_NAME}
     ${PORT_DIR}/device_common/device_common.c
     ${PORT_DIR}/device_common/system_common.c
     ${PORT_DIR}/device_common/logger.c
+    ${PORT_DIR}/device_common/simple_cert_checker.c
 
     ${PORT_DIR}/flash_interface/flash_control.c
 
@@ -25,7 +26,6 @@ add_executable(${TARGET_NAME}
     ${APP_DIR}/aws_iot/iot_jobs_job_list.c
     ${APP_DIR}/aws_iot/iot_jobs_job_ota_handler.c
 
-    ${APP_DIR}/tasks/fleet_provisioning_task.c
     ${APP_DIR}/tasks/aws_iot_jobs_task.c
     ${APP_DIR}/tasks/idle_task.c
     ${APP_DIR}/tasks/main_app_task.c
@@ -84,6 +84,7 @@ add_executable(${TARGET_NAME_LINKER}
     ${PORT_DIR}/device_common/device_common.c
     ${PORT_DIR}/device_common/system_common.c
     ${PORT_DIR}/device_common/logger.c
+    ${PORT_DIR}/device_common/simple_cert_checker.c
 
     ${PORT_DIR}/flash_interface/flash_control.c
 
@@ -103,7 +104,6 @@ add_executable(${TARGET_NAME_LINKER}
     ${APP_DIR}/aws_iot/iot_jobs_job_list.c
     ${APP_DIR}/aws_iot/iot_jobs_job_ota_handler.c
 
-    ${APP_DIR}/tasks/fleet_provisioning_task.c
     ${APP_DIR}/tasks/aws_iot_jobs_task.c
     ${APP_DIR}/tasks/idle_task.c
     ${APP_DIR}/tasks/main_app_task.c

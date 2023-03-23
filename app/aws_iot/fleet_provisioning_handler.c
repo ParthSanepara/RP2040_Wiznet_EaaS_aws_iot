@@ -359,6 +359,9 @@ bool fleet_provisioning_handle(DEVICE_INFO_t *pDeviceInfo)
 
     g_aws_template_name = pDeviceInfo->AWS_TEMPLATE_NAME;
     
+    TRACE_INFO("Start Fleet Provisioning");
+    TRACE_INFO("Thing Name : %s, Template Name : %s", pDeviceInfo->THING_NAME, g_aws_template_name);
+
     set_mqtt_event_callback(fleet_provisioning_event_callback);
 
     g_recved_mqtt_create_key_and_cert_accept_msg = false;

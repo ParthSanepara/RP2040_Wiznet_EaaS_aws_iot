@@ -10,7 +10,12 @@
         "freertos.h": "c",
         "rp2040.h": "c",
         "core_cm0plus.h": "c",
-        "w5x00_spi.h": "c"
+        "w5x00_spi.h": "c",
+        "initializer_list": "c",
+        "type_traits": "c",
+        "test_procedure.h": "c",
+        "simple_cert_checker.h": "c",
+        "dhcp.h": "c"
     },
     "cmake.buildBeforeRun": true,
     "C_Cpp.default.configurationProvider": "ms-vscode.makefile-tools"

@@ -4,11 +4,9 @@
 #include "hardware/clocks.h"
 #include "flash_control.h"
 #include "system_common.h"
+#include "test_menu.h"
 
-#define JUMP_APP_TIMEOUT_MS             1000
-
-#define KEY_VALUE_BOOT_DOWN_ENTER       '!'
-
+#define JUMP_APP_TIMEOUT_MS             2000
 
 /* Clock */
 #define PLL_SYS_KHZ (133 * 1000)
@@ -29,11 +27,6 @@ APP_COMMON_t            appCommon;
 /* Clock */
 static void set_clock_khz(void);
 
-/**
- * ----------------------------------------------------------------------------------------------------
- * Main
- * ----------------------------------------------------------------------------------------------------
- */
 int main()
 {
     uint32_t startTimeoutMs, currentTimeoutMs;
@@ -44,7 +37,6 @@ int main()
 
     stdio_init_all();
 
-    logger_mutex_init();
     init_flash_cri_section();
 
     print_boot_info();
@@ -54,6 +46,7 @@ int main()
 
     startTimeoutMs = get_time_ms();
     TRACE_MSG("Jump to App after %ldms", (uint32_t)JUMP_APP_TIMEOUT_MS);
+
     while(1)
     {
         currentTimeoutMs = get_time_ms();
@@ -61,17 +54,22 @@ int main()
         {
             break;
         }
-        else if( (currentTimeoutMs - startTimeoutMs) > 100 )
+        else if( (currentTimeoutMs - startTimeoutMs) > 1000 )
         {
             TRACE_MSG_WITHOUT_NL("\b\b\b\b\b\b\b\b%ldms", (currentTimeoutMs - startTimeoutMs));
         }
 
-        if(appCommon.DEVICE_INFO.START_FW_OTA_STATUS == START_FW_OTA_ENABLE)
+        if(appCommon.DEVICE_OTA_INFO.START_FIRMWARE_OTA_STATUS == START_FW_OTA_ENABLE)
         {
             // Start OTA
-            printf("Start OTA\r\n");
-        }
+            TRACE_MSG("");
+            TRACE_MSG("Start OTA");
+            copy_ota_area_data_to_app_area(appCommon.DEVICE_OTA_INFO.FIRMWARE_SIZE);
 
+            TRACE_MSG("Change Confiugration");
+            appCommon.DEVICE_OTA_INFO.START_FIRMWARE_OTA_STATUS = START_FW_OTA_DISABLE;
+            save_flash_common_config_info(&appCommon);
+        }
 
         // Wait 1MS
         ch = getchar_timeout_us(1000);
@@ -80,24 +78,26 @@ int main()
             continue;
         }
 
-        if(ch == KEY_VALUE_BOOT_DOWN_ENTER)
+        TRACE_MSG("");
+        if(ch == KEY_VALUE_ERASE_FLASH_MENU)
         {
-            printf("Get C\r\n");
+            procedure_erase_flash();
+            startTimeoutMs = get_time_ms();
         }
-        else if(ch == '1')
+        else if(ch == KEY_VALUE_PRINT_FLASH_MENU)
         {
-            uint8_t *pFlashStartAddr = (uint8_t *)FLASH_APP_START_ADDR;
-            print_dump_data(pFlashStartAddr, 100);
-
+            procedure_print_flash();
+            startTimeoutMs = get_time_ms();
         }
-        
+       
         
         
         
     }
 
-    printf("\r\nJump Addr = 0x%08X\r\n\r\n", FLASH_APP_START_ADDR);
-    DELAY_MS_NON_OS(100);
+    TRACE_MSG("");
+    TRACE_MSG("Jump Addr = 0x%08X\r\n", FLASH_APP_START_ADDR);
+    DELAY_MS(100);
 
     disable_interrupts();
     jump_to_app(FLASH_APP_START_ADDR);

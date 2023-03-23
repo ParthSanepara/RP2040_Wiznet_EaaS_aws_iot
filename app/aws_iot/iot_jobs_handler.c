@@ -30,14 +30,12 @@
 tlsContext_t                g_iot_jobs_mqtt_tls_context;
 AWS_JOBS_EXECUTION_PARAMS_t g_iot_jobs_execution_param;
 
-uint8_t *p_aws_thing_name_for_event_callback;
-uint8_t *p_aws_job_id_for_event_callback;
+volatile uint8_t *p_aws_thing_name_for_event_callback;
+volatile uint8_t *p_aws_job_id_for_event_callback;
 
 bool g_recved_mqtt_get_job_accept_msg_for_event_callback = false;
 bool g_recved_mqtt_start_next_job_accept_msg_for_event_callback = false;
 bool g_recved_mqtt_job_update_accept_msg_for_event_callback = false;
-
-
 
 
 uint8_t g_aws_mqtt_iot_jobs_pub_msg_buf[1024] = { 0, };
@@ -201,11 +199,13 @@ bool iot_jobs_get_procedure (DEVICE_INFO_t *pDeviceInfo)
     return true;
 }
 
-bool iot_jobs_start_job_document_procedure (DEVICE_INFO_t *pDeviceInfo)
+bool iot_jobs_start_job_document_procedure (APP_COMMON_t *pAppCommon)
 {
     bool retStatus = false;
     uint8_t tempJobId[MAX_AWS_JOB_ID_SIZE];    
     uint16_t tempJobIdLength;
+
+    pAppCommon->enableReboot = false;
 
     if(get_first_job_id(tempJobId, &tempJobIdLength) == false)
     {
@@ -221,11 +221,11 @@ bool iot_jobs_start_job_document_procedure (DEVICE_INFO_t *pDeviceInfo)
         return true;
     }
 
-    TRACE_DEBUG("Exist Job ID : %s", tempJobId);
-    TRACE_DEBUG("Do Start Next Procedure");
+    TRACE_INFO("Exist Job ID : %s", tempJobId);
+    TRACE_INFO("Do Start Next Procedure");
     
     memset(&g_iot_jobs_execution_param, 0x00, sizeof(g_iot_jobs_execution_param));
-    retStatus = iot_jobs_start_next_procedure(pDeviceInfo);
+    retStatus = iot_jobs_start_next_procedure(&pAppCommon->DEVICE_INFO);
     if(retStatus == false)
     {
         TRACE_ERROR("Fail to start next procedure");
@@ -234,14 +234,14 @@ bool iot_jobs_start_job_document_procedure (DEVICE_INFO_t *pDeviceInfo)
 
     g_iot_jobs_execution_param.IS_JOB_STARTED = true;
     
-    retStatus = start_job_document(pDeviceInfo, &g_iot_jobs_execution_param);
+    retStatus = start_job_document(pAppCommon, &g_iot_jobs_execution_param);
     if(retStatus == false)
     {
         TRACE_ERROR("Fail to start job documnet");
 
         g_iot_jobs_execution_param.IS_JOB_STARTED = false;
 
-        retStatus = iot_jobs_update_job_status_procedure(pDeviceInfo, g_iot_jobs_execution_param.JOB_ID, JOBS_API_STATUS_FAILED);
+        retStatus = iot_jobs_update_job_status_procedure(&pAppCommon->DEVICE_INFO, g_iot_jobs_execution_param.JOB_ID, JOBS_API_STATUS_FAILED);
         if(retStatus == true)
         {
             del_first_job_id();
@@ -251,7 +251,7 @@ bool iot_jobs_start_job_document_procedure (DEVICE_INFO_t *pDeviceInfo)
 
     g_iot_jobs_execution_param.IS_JOB_STARTED = false;
 
-    retStatus = iot_jobs_update_job_status_procedure(pDeviceInfo, g_iot_jobs_execution_param.JOB_ID, JOBS_API_STATUS_SUCCEEDED);
+    retStatus = iot_jobs_update_job_status_procedure(&pAppCommon->DEVICE_INFO, g_iot_jobs_execution_param.JOB_ID, JOBS_API_STATUS_SUCCEEDED);
     if(retStatus == true)
     {
         del_first_job_id();
@@ -259,26 +259,29 @@ bool iot_jobs_start_job_document_procedure (DEVICE_INFO_t *pDeviceInfo)
 
     // TRACE_DEBUG("JOB ID : %s", g_iot_jobs_execution_param.JOB_ID);
     // TRACE_DEBUG("JOB Document : %s", g_iot_jobs_execution_param.JOB_DOCUMENT);
+    if(pAppCommon->enableReboot == true)
+    {
+        TRACE_DEBUG("Device Reboot");
+        device_reboot();
+    }
 
     return true;
 }
 
-bool start_job_document(DEVICE_INFO_t *pDeviceInfo, AWS_JOBS_EXECUTION_PARAMS_t *pJobExecutionParam)
+bool start_job_document(APP_COMMON_t *pAppCommon, AWS_JOBS_EXECUTION_PARAMS_t *pJobExecutionParam)
 {
     bool retStatus;
 
     size_t jobDocumentLength = 0;
     APP_COMMON_t  tempAppCommonInfo;
-    
 
-    TRACE_DEBUG("Start Job Document");
     jobDocumentLength = strlen(pJobExecutionParam->JOB_DOCUMENT);
 
     // JOB TYPE이 OTA면 아래 수행
     if( strncmp( pJobExecutionParam->JOB_TYPE, AWS_JOB_TYPE_OTA, sizeof(AWS_JOB_TYPE_OTA)) == 0 )
     {
-        pDeviceInfo->START_FW_OTA_STATUS = START_FW_OTA_DISABLE;
-        
+        pAppCommon->DEVICE_OTA_INFO.START_FIRMWARE_OTA_STATUS = START_FW_OTA_DISABLE;
+
         memset(&pJobExecutionParam->JOB_OTA, 0x00, sizeof(pJobExecutionParam->JOB_OTA));
         retStatus = parsing_ota_job_params( pJobExecutionParam->JOB_DOCUMENT, jobDocumentLength,
                                             pJobExecutionParam->JOB_OTA.FIRMWARE_URL, sizeof(pJobExecutionParam->JOB_OTA.FIRMWARE_URL),
@@ -298,15 +301,18 @@ bool start_job_document(DEVICE_INFO_t *pDeviceInfo, AWS_JOBS_EXECUTION_PARAMS_t 
             return false;
         }
 
-        pDeviceInfo->START_FW_OTA_STATUS = START_FW_OTA_ENABLE;
+        // ota_download_firmware 함수 내에서 CRC, FW size 유효성 검사 수행
+        pAppCommon->DEVICE_OTA_INFO.START_FIRMWARE_OTA_STATUS = START_FW_OTA_ENABLE;
+        pAppCommon->DEVICE_OTA_INFO.FIRMWARE_SIZE = pJobExecutionParam->JOB_OTA.FIRMWARE_SIZE;
+        pAppCommon->DEVICE_OTA_INFO.FIRMWARE_CRC = pJobExecutionParam->JOB_OTA.FIRMWARE_CRC;
 
         // Bootloader에서 FW Update를 시작 할 수 있도록 Flag를 Enable
-        load_flash_common_config_info(&tempAppCommonInfo);
-        memcpy(&tempAppCommonInfo.DEVICE_INFO, pDeviceInfo, sizeof(tempAppCommonInfo.DEVICE_INFO));
+        //load_flash_common_config_info(&tempAppCommonInfo);
+        memcpy(&tempAppCommonInfo, pAppCommon, sizeof(tempAppCommonInfo));
         save_flash_common_config_info(&tempAppCommonInfo);
 
-        // Device Reboot
-        device_reboot();        
+        TRACE_INFO("Set Enable Reboot Triiger");
+        pAppCommon->enableReboot = true;
     }
     // JOB TYPE이 TEST면 아래 수행
     // 해당 JOB은 Example용 DUMMY JOB

@@ -8,6 +8,7 @@
 #define USER_FLASH_PAGE_SIZE          ( FLASH_PAGE_SIZE )       // 256B
 #define USER_FLASH_SECTOR_SIZE        (  FLASH_SECTOR_SIZE )    // 4KB
 
+#define CONFIG_AREA_SIZE            ( 0x40000 )     // 256KB
 #define BOOT_LOADER_SIZE            ( 0x40000 )     // 256KB
 #define APPLICATION_SIZE            ( 0x80000 )     // 512KB
 
@@ -26,23 +27,34 @@
 
 void init_flash_cri_section   (void);
 
+void erase_flash    (uint32_t offset, uint32_t size);
+void write_flash    (uint32_t offset, uint8_t *pData, uint32_t dataSize);
+
+void erase_flash_provisioned_cert_info  (void);
+void erase_flash_common_config_info     (void);
+//void erase_flash_ota_binary             (uint32_t binarySize);
+void erase_flash_total_config_area      (void);
+void erase_flash_total_factory_area     (void);
+void erase_flash_total_ota_area         (void);
+
+void save_flash_provisioned_cert_info   (AWS_FP_DEVICE_CERT_INFO_t *pFpCertInfo);
+void save_flash_common_config_info      (APP_COMMON_t *pAppCommonInfo);
+
+void write_flash_ota_binary             (uint32_t flashOffset, uint8_t *pBinary, uint32_t dataSize);
+
 void load_flash_provisioned_cert_info       (AWS_FP_DEVICE_CERT_INFO_t *pFpCertInfo);
 void load_flash_certificate_ownership_token (uint8_t *pData, uint16_t size);
-
-void save_flash_provisioned_cert_info       (AWS_FP_DEVICE_CERT_INFO_t *pFpCertInfo);
-void print_flash_provioned_cert_info        (void);
-void erase_flash_provisioned_cert_info      (void);
-
+void load_flash_certificate_cert_id         (uint8_t *pData, uint16_t size);
 void load_flash_common_config_info          (APP_COMMON_t *pAppCommonInfo);
-void save_flash_common_config_info          (APP_COMMON_t *pAppCommonInfo);
+
+void print_flash_provioned_cert_info        (void);
 void print_flash_common_config_info         (void);
-bool check_flash_common_config_info_empty   (void);
-void erase_flash_common_config_info         (void);
+void print_flash_ota_binary                 (void);
 
-void erase_flash_ota_binary (uint32_t binarySize);
-void write_flash_ota_binary (uint32_t flashOffset, uint8_t *pBinary, uint16_t dataSize);
+void copy_ota_area_data_to_app_area         (uint32_t dataSize);
+void copy_factory_area_data_to_app_area     (uint32_t dataSize);
 
-void print_flash_ota_binary     (void);
-uint8_t* get_flash_ota_binary   (void);
+bool    check_flash_common_config_info_empty  (void);
+uint8_t* get_flash_ota_binary_start_address   (void);
 
 #endif

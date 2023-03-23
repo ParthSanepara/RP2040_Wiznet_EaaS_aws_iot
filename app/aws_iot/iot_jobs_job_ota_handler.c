@@ -72,7 +72,7 @@ int32_t ota_http_send_request_callback(TransportInterface_t *pTransportInterface
 
     httpStatus = HTTPClient_InitializeRequestHeaders(&requestHeaders, &requestInfo);
     if (httpStatus != HTTPSuccess)
-        TRACE_DEBUG("Failed to initialize HTTP request headers: Error=%s.", HTTPClient_strerror(httpStatus));
+        TRACE_ERROR("Failed to initialize HTTP request headers: Error=%s.", HTTPClient_strerror(httpStatus));
 
     httpStatus = HTTPClient_AddHeader(&requestHeaders,
                                       HTTP_CONTENT_TYPE_FIELD,
@@ -80,7 +80,7 @@ int32_t ota_http_send_request_callback(TransportInterface_t *pTransportInterface
                                       HTTP_CONTENT_TYPE_VALUE,
                                       HTTP_CONTENT_TYPE_VALUE_LEN);
     if (httpStatus != HTTPSuccess)
-        TRACE_DEBUG("Failed to initialize HTTP request headers: Error=%s.", HTTPClient_strerror(httpStatus));
+        TRACE_ERROR("Failed to initialize HTTP request headers: Error=%s.", HTTPClient_strerror(httpStatus));
 
     if ((HTTP_REQUEST_KEEP_ALIVE_FLAG & requestInfo.reqFlags) == 0U)
     {
@@ -90,7 +90,7 @@ int32_t ota_http_send_request_callback(TransportInterface_t *pTransportInterface
                                           HTTP_CONNECTION_CLOSE_VALUE,
                                           HTTP_CONNECTION_CLOSE_VALUE_LEN);
         if (httpStatus != HTTPSuccess)
-            TRACE_DEBUG("Failed to initialize HTTP request headers: Error=%s.", HTTPClient_strerror(httpStatus));
+            TRACE_ERROR("Failed to initialize HTTP request headers: Error=%s.", HTTPClient_strerror(httpStatus));
     }
 
     if (httpStatus == HTTPSuccess)
@@ -100,10 +100,10 @@ int32_t ota_http_send_request_callback(TransportInterface_t *pTransportInterface
                    (int32_t)requestInfo.hostLen, requestInfo.pHost,
                    (int32_t)requestInfo.pathLen, requestInfo.pPath);
 
-        TRACE_DEBUG("Request Headers:\n%.*s\n"
-                    "Request Body:\n%.*s\n",
-                    (int32_t)requestHeaders.headersLen, (char *)requestHeaders.pBuffer,
-                    (int32_t)http_config->bodyLen, http_config->bodyDataPtr);
+        // TRACE_DEBUG("Request Headers:\n%.*s\n"
+        //             "Request Body:\n%.*s\n",
+        //             (int32_t)requestHeaders.headersLen, (char *)requestHeaders.pBuffer,
+        //             (int32_t)http_config->bodyLen, http_config->bodyDataPtr);
 
         /* Send the request and receive the response. */
         httpStatus = HTTPClient_Send(pTransportInterface,
@@ -115,7 +115,7 @@ int32_t ota_http_send_request_callback(TransportInterface_t *pTransportInterface
     }
     else
     {
-        TRACE_DEBUG("Failed to initialize HTTP request headers: Error=%s.", HTTPClient_strerror(httpStatus));
+        TRACE_ERROR("Failed to initialize HTTP request headers: Error=%s.", HTTPClient_strerror(httpStatus));
     }
 
     TRACE_DEBUG("Response Headers Length: %d", response.headersLen);
@@ -125,17 +125,17 @@ int32_t ota_http_send_request_callback(TransportInterface_t *pTransportInterface
         currentTotalLen = 0;
 
         TRACE_DEBUG("Response buffer has insufficient");
-        TRACE_DEBUG("Response Content Length: %d", response.contentLength);
-        TRACE_DEBUG("Response Body Length: %d", response.bodyLen);
+        // TRACE_DEBUG("Response Content Length: %d", response.contentLength);
+        // TRACE_DEBUG("Response Body Length: %d", response.bodyLen);
         //TRACE_DEBUG("Response Body:\n%.*s", response.bodyLen, response.pBody);
 
         TRACE_DEBUG("Temp Flash Erase for OTA");
-        erase_flash_ota_binary(response.contentLength);
+        erase_flash_total_ota_area();
         OS_DELAY_MS(1000);
 
         while (1)
         {
-            OS_DELAY_MS(10);
+            OS_DELAY_MS(100);
             memset(tempOtaBinaryBuffer, 0, HTTP_BUF_MAX_SIZE);
             
             if( isFirstRecv == true )
@@ -154,7 +154,7 @@ int32_t ota_http_send_request_callback(TransportInterface_t *pTransportInterface
                 currentReceived = pTransportInterface->recv(pTransportInterface->pNetworkContext, 
                                                             tempOtaBinaryBuffer, 
                                                             HTTP_BUF_MAX_SIZE);
-                TRACE_DEBUG("1st Recv. %d",currentReceived);                                                            
+                //TRACE_DEBUG("1st Recv. %d",currentReceived);                                                            
 
                 if(currentReceived < HTTP_BUF_MAX_SIZE)
                 {
@@ -163,7 +163,7 @@ int32_t ota_http_send_request_callback(TransportInterface_t *pTransportInterface
                                                             (HTTP_BUF_MAX_SIZE - currentReceived));
                     currentReceived += received2nd;
                     
-                    TRACE_DEBUG("2nd Recv. %d/%d",received2nd, currentReceived);
+                    //TRACE_DEBUG("2nd Recv. %d/%d",received2nd, currentReceived);
                 }
 
             }
@@ -174,7 +174,7 @@ int32_t ota_http_send_request_callback(TransportInterface_t *pTransportInterface
             if (currentReceived > 0)
             {
                 //TRACE_DEBUG("\n%.*s", response.bodyLen, response.pBody);
-                
+                TRACE_DEBUG("Write Data to Ota area. Addr : %lX, data size : %d", ota_flash_index, currentReceived);
                 write_flash_ota_binary(ota_flash_index, tempOtaBinaryBuffer, currentReceived);
 
                 currentTotalLen += currentReceived;
@@ -192,15 +192,21 @@ int32_t ota_http_send_request_callback(TransportInterface_t *pTransportInterface
             }
         }
     }
-    else if (httpStatus == HTTPSuccess)
+    else if( httpStatus == HTTPSuccess )
     {
-        //TRACE_DEBUG("Response Content Length: %d", response.contentLength);
-        //TRACE_DEBUG("Response Body:\n%.*s", response.bodyLen, response.pBody);
+        TRACE_DEBUG("Response Header:\r\n%.*s", response.headersLen, response.pHeaders);
+        TRACE_DEBUG("Response Body:\r\n%.*s", response.bodyLen, response.pBody);
     }
 
     if (httpStatus != HTTPSuccess)
     {
         returnStatus = -1;
+    }
+
+    // 수신할 바이너리가 없는 경우
+    if (currentReceived == 0)
+    {
+        returnStatus = -2;
     }
 
     return returnStatus;
@@ -210,6 +216,7 @@ bool ota_download_firmware(uint8_t *pUrl, uint32_t fwSize, uint16_t fwCrc)
 {
     uint8_t *pOtaBinFlashStartAddress;
     uint16_t calcedCrc=0;
+    int retHttpResult = 0;
     TRACE_DEBUG("URL : %s", pUrl);
 
     memset(&g_http_ota_tls_context, 0x00, sizeof(g_http_ota_tls_context));
@@ -220,21 +227,26 @@ bool ota_download_firmware(uint8_t *pUrl, uint32_t fwSize, uint16_t fwCrc)
     g_http_ota_tls_context.rootca_option = MBEDTLS_SSL_VERIFY_NONE; // not used client certificate
     g_http_ota_tls_context.clica_option = 0;                        // not used Root CA verify
 
-    
-    if( http_get(SOCKET_HTTP, pUrl, &g_http_ota_tls_context, true) == -1)
+    retHttpResult = http_get(SOCKET_HTTP, pUrl, &g_http_ota_tls_context, true);
+    unset_http_request_callback(ota_http_send_request_callback);
+
+    if( retHttpResult == -1 )
     {
         TRACE_ERROR("Fail to http get.");
-        unset_http_request_callback(ota_http_send_request_callback);
+        return false;
+    }
+    else if( retHttpResult == -2 )
+    {
+        TRACE_WARN("There is no binary data");
         return false;
     }
 
-    unset_http_request_callback(ota_http_send_request_callback);
-    TRACE_DEBUG("Success to download firmware.")
+    TRACE_INFO("Success to download firmware.")
 
     TRACE_DEBUG("Verify firmware");
     TRACE_DEBUG("FW Size : %d", fwSize);
     
-    pOtaBinFlashStartAddress = get_flash_ota_binary();
+    pOtaBinFlashStartAddress = get_flash_ota_binary_start_address();
     calcedCrc = crc16_ccitt(pOtaBinFlashStartAddress, fwSize);
 
     TRACE_DEBUG("Calced CRC : %02X, Wanted CRC : %02X", calcedCrc, fwCrc);

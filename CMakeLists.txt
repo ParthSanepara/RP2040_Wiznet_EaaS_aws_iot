@@ -97,7 +97,7 @@ add_subdirectory(${PICO_SDK_DIR})
 add_subdirectory(${MBEDTLS_DIR})
 add_subdirectory(${PORT_DIR})
 add_subdirectory(${APP_DIR})
-#add_subdirectory(${BOOT_DIR})
+add_subdirectory(${BOOT_DIR})
 
 # Set compile options
 add_compile_options(

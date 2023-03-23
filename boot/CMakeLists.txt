@@ -2,6 +2,7 @@ set(TARGET_NAME rp2040_wiznet_eaas_boot)
 
 add_executable(${TARGET_NAME}
     ${BOOT_DIR}/main.c
+    ${BOOT_DIR}/test_menu.c
 
     ${PORT_DIR}/device_common/device_common.c
     ${PORT_DIR}/device_common/system_common.c
@@ -37,6 +38,7 @@ pico_add_extra_outputs(${TARGET_NAME})
 set(TARGET_NAME_LINKER ${TARGET_NAME}_linker)
 add_executable(${TARGET_NAME_LINKER}
     ${BOOT_DIR}/main.c
+    ${BOOT_DIR}/test_menu.c
 
     ${PORT_DIR}/device_common/device_common.c
     ${PORT_DIR}/device_common/system_common.c

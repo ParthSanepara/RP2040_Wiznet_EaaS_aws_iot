@@ -20,6 +20,19 @@ typedef enum
     START_FW_OTA_ENABLE  = 1
 } OTA_STATUS_t;
 
+typedef enum
+{
+    AWS_IOT_JOBS_DISCONNECTED = 0,
+    AWS_IOT_JOBS_CONNECTED = 1,
+} AWS_IOT_JOBS_STATUS_t;
+
+typedef struct
+{
+    OTA_STATUS_t START_FIRMWARE_OTA_STATUS;
+    uint32_t     FIRMWARE_SIZE;
+    uint16_t     FIRMWARE_CRC;
+} DEVICE_OTA_INFO_t;
+
 typedef struct
 {
     wiz_NetInfo ETH_NET_INFO;
@@ -31,29 +44,26 @@ typedef struct
     uint8_t AWS_END_POINT[128];
     uint8_t AWS_TEMPLATE_NAME[64];
 
-    OTA_STATUS_t START_FW_OTA_STATUS;
-    
     uint8_t CERT_OWNERSHIP_TOKEN[MAX_FP_CERT_OWNERSHIP_TOKEN_SIZE];
 } DEVICE_INFO_t;
 
-typedef enum
-{
-    AWS_IOT_JOBS_DISCONNECTED = 0,
-    AWS_IOT_JOBS_CONNECTED = 1,
-} AWS_IOT_JOBS_STATUS_t;
 
 typedef struct 
 {
     DEVICE_INFO_t           DEVICE_INFO;
+    DEVICE_OTA_INFO_t       DEVICE_OTA_INFO;
     AWS_IOT_JOBS_STATUS_t   AWS_IOT_JOBS_STATUS; 
 
     bool isWizChipLinkUp;
     bool isDhcpDone;
 
-    bool isValidClaimCertInfo;
+    bool isValidClaimCertInfo;          // Not used yet
     bool isValidProvisionedCertInfo;
+    bool enableRefreshProvisionedCert;
 
     bool isRunAwsIotJobs;
+
+    bool enableReboot;
 
 } APP_COMMON_t;
 

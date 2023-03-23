@@ -1,5 +1,0 @@
-#ifndef _FLEET_PROVISIONING_TASK_H_
-#define _FLEET_PROVISIONING_TASK_H_
-
-
-#endif

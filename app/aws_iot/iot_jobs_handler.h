@@ -11,8 +11,8 @@ bool iot_jobs_connect_procedure     (DEVICE_INFO_t *pDeviceInfo);
 void iot_jobs_close_procedure       (DEVICE_INFO_t *pDeviceInfo);
 
 bool iot_jobs_get_procedure                 (DEVICE_INFO_t *pDeviceInfo);
-bool iot_jobs_start_job_document_procedure  (DEVICE_INFO_t *pDeviceInfo);
-bool start_job_document                     (DEVICE_INFO_t *pDeviceInfo, AWS_JOBS_EXECUTION_PARAMS_t *pJobExecutionParam);
+bool iot_jobs_start_job_document_procedure  (APP_COMMON_t *pAppCommon);
+bool start_job_document                     (APP_COMMON_t *pAppCommon, AWS_JOBS_EXECUTION_PARAMS_t *pJobExecutionParam);
 
 bool iot_jobs_start_next_procedure          (DEVICE_INFO_t *pDeviceInfo);
 bool iot_jobs_update_job_status_procedure   (DEVICE_INFO_t *pDeviceInfo, uint8_t *pJobId, uint8_t *pJobStatus);

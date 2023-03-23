@@ -30,7 +30,7 @@ set(RP2040_WIZNET_EAAS_PATCH_DIR "${RP2040_WIZNET_EAAS_SRC_DIR}/patches")
 # 	message("FreeRTOS-Kernel cleaned")
 # endif()
 
-# Delete untracked files in ioLibrary_Driver
+# #Delete untracked files in ioLibrary_Driver
 # if(EXISTS "${IOLIBRARY_DRIVER_SRC_DIR}/.git")
 # 	message("cleaning ioLibrary_Driver...")
 # 	execute_process(COMMAND ${GIT_EXECUTABLE} -C ${IOLIBRARY_DRIVER_SRC_DIR} clean -fdx)
@@ -38,7 +38,7 @@ set(RP2040_WIZNET_EAAS_PATCH_DIR "${RP2040_WIZNET_EAAS_SRC_DIR}/patches")
 # 	message("ioLibrary_Driver cleaned")
 # endif()
 
-# Delete untracked files in mbedtls
+# #Delete untracked files in mbedtls
 # if(EXISTS "${MBEDTLS_SRC_DIR}/.git")
 # 	message("cleaning mbedtls...")
 # 	execute_process(COMMAND ${GIT_EXECUTABLE} -C ${MBEDTLS_SRC_DIR} clean -fdx)
@@ -75,12 +75,12 @@ set(RP2040_WIZNET_EAAS_PATCH_DIR "${RP2040_WIZNET_EAAS_SRC_DIR}/patches")
 # execute_process(COMMAND ${GIT_EXECUTABLE} -C ${PICO_SDK_SRC_DIR} submodule update --init)
 
 # # Delete untracked files in coreHTTP
-# # if(EXISTS "${AWS_IOT_DEVICE_SDK_EMBEDDED_C_COREHTTP_SRC_DIR}/.git")
-# # 	message("cleaning aws-iot-device-sdk-embedded-C coreHTTP...")
-# # 	execute_process(COMMAND ${GIT_EXECUTABLE} -C ${AWS_IOT_DEVICE_SDK_EMBEDDED_C_COREHTTP_SRC_DIR} clean -fdx)
-# # 	execute_process(COMMAND ${GIT_EXECUTABLE} -C ${AWS_IOT_DEVICE_SDK_EMBEDDED_C_COREHTTP_SRC_DIR} reset --hard)
-# # 	message("aws-iot-device-sdk-embedded-C coreHTTP cleaned")
-# # endif()
+# if(EXISTS "${AWS_IOT_DEVICE_SDK_EMBEDDED_C_COREHTTP_SRC_DIR}/.git")
+# 	message("cleaning aws-iot-device-sdk-embedded-C coreHTTP...")
+# 	execute_process(COMMAND ${GIT_EXECUTABLE} -C ${AWS_IOT_DEVICE_SDK_EMBEDDED_C_COREHTTP_SRC_DIR} clean -fdx)
+# 	execute_process(COMMAND ${GIT_EXECUTABLE} -C ${AWS_IOT_DEVICE_SDK_EMBEDDED_C_COREHTTP_SRC_DIR} reset --hard)
+# 	message("aws-iot-device-sdk-embedded-C coreHTTP cleaned")
+# endif()
 
 # # Delete untracked files in coreMQTT
 # if(EXISTS "${AWS_IOT_DEVICE_SDK_EMBEDDED_C_COREMQTT_SRC_DIR}/.git")
