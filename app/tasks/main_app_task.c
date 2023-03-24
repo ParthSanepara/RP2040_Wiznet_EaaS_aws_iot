@@ -47,6 +47,11 @@ void main_app_task(void *pParam)
     {
         OS_DELAY_MS(100);
 
+        if(pAppCommon->isWizChipLinkUp == false || pAppCommon->isDhcpDone == false)
+        {
+            continue;
+        }
+
         // Provisoned 인증서가 없거나, AWS IoT Job 연결이 연속적으로 끊어지면 fleet_provsioning 수행
         if(pAppCommon->enableRefreshProvisionedCert == true)
         {

@@ -94,6 +94,8 @@ bool dhcp_process(wiz_NetInfo *pNetInfo)
 
         /* Get network information */
         display_network_information(pNetInfo);
+
+        goto DHCP_PROCESS_DONE;
     }
 
     startTimeStamp = get_time_ms();
@@ -116,11 +118,11 @@ bool dhcp_process(wiz_NetInfo *pNetInfo)
             return false;
         }
 
-        if(link == PHY_LINK_OFF)
-        {
-            DHCP_stop();
-            continue;
-        }
+        // if(link == PHY_LINK_OFF)
+        // {
+        //     DHCP_stop();
+        //     continue;
+        // }
 
         // DHCP 완료 될 때 까지 DHCP_run()을 계속 호출 해야 함.
         retval = DHCP_run();
@@ -146,6 +148,7 @@ bool dhcp_process(wiz_NetInfo *pNetInfo)
         }
     }
 
+DHCP_PROCESS_DONE:
     //MEMCPY(&g_temp_net_info_for_dhcp, pNetInfo, sizeof(g_temp_net_info_for_dhcp));
     MEMCPY(&pNetInfo->ip, &g_temp_net_info_for_dhcp.ip, sizeof(g_temp_net_info_for_dhcp.ip));
     MEMCPY(&pNetInfo->gw, &g_temp_net_info_for_dhcp.gw, sizeof(g_temp_net_info_for_dhcp.gw));

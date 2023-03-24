@@ -14,7 +14,7 @@
 #define AWS_SUB_TOPIC_REGISTER_THING_REJECTED       "$aws/provisioning-templates/%s/provision/json/rejected"        // Need TEMPLETE_NAME
 
 #define AWS_PUB_TOPIC_CREATE_KEY_AND_CERT           "$aws/certificates/create/cbor"
-#define AWS_PUB_TOPIC_REGISTER_THING                "$aws/provisioning-templates/%s/provision/json"
+#define AWS_PUB_TOPIC_REGISTER_THING                "$aws/provisioning-templates/%s/provision/json"                 // Need TEMPLATE_NAME
 
 #define AWS_REGISTER_THING_PARAMETERS               "{\r\n"                                                         \
                                                     "   \"certificateOwnershipToken\" : \"%s\",\r\n"                \

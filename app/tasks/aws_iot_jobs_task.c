@@ -38,6 +38,11 @@ void aws_iot_jobs_task(void *pParam)
     {
         OS_DELAY_MS(100);
 
+        if(pAppCommon->isWizChipLinkUp == false || pAppCommon->isDhcpDone == false)
+        {
+            continue;
+        }
+
         if(connectFailCount > IOT_JOBS_MAX_CONNECT_FAIL_COUNT)
         {
             // IOT JOBS에 연결이 지속적으로 실패 하면, 인증서 갱신을 위해 아래 변수를 enable 한다.

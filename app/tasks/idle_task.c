@@ -49,10 +49,18 @@ void idle_task(void *pParam)
 
             if( (currentTimeStamp - refreshDhcpTimeStamp) > dhcpLeaseTimeS * 1000 )
             {
-                refreshDhcpTimeStamp = get_time_ms();
                 TRACE_DEBUG("DHCP Lease time is over. Lease Time : %ds", dhcpLeaseTimeS);
                 TRACE_DEBUG("Refresh DHCP. Refresh Timeout : %dms", (currentTimeStamp - refreshDhcpTimeStamp));
-                dhcp_process(&pAppCommon->DEVICE_INFO.ETH_NET_INFO);
+                TRACE_DEBUG("DHCP Stop");
+                DHCP_stop();
+                pAppCommon->isDhcpDone = false;
+
+                dhcpStatus = dhcp_process(&pAppCommon->DEVICE_INFO.ETH_NET_INFO);
+                if(dhcpStatus == true)
+                {
+                    pAppCommon->isDhcpDone = true;
+                    refreshDhcpTimeStamp = get_time_ms();
+                }
             }
         }
         /////////////////////////////////////////////////////////////////////////////////////
