@@ -4,6 +4,18 @@
 #include "flash_control.h"
 #include "port_common.h"
 
+void display_menu(void)
+{
+    TRACE_MSG("==========================================");
+    TRACE_MSG("1  : Erase Flash Menu");
+    TRACE_MSG("2  : Print Flash Menu");
+    TRACE_MSG("3  : Factory Fw Menu");
+    TRACE_MSG("q  : Quit");
+    TRACE_MSG("==========================================");
+    TRACE_MSG("Input Key : ");
+
+}
+
 void display_erase_flash_menu(void)
 {
     TRACE_MSG("==========================================");
@@ -12,7 +24,7 @@ void display_erase_flash_menu(void)
     TRACE_MSG("3  : Erase Factory Area");
     TRACE_MSG("4  : Erase OTA Area");
     TRACE_MSG("5  : Erase Provisioned Cert Info");
-    TRACE_MSG("Q  : Quit");
+    TRACE_MSG("q  : Quit");
     TRACE_MSG("==========================================");
     TRACE_MSG("Input Key : ");
 }
@@ -25,7 +37,17 @@ void display_print_flash_menu(void)
     TRACE_MSG("3  : Print App Area");
     TRACE_MSG("4  : Print Factory Area");
     TRACE_MSG("5  : Print OTA Area");
-    TRACE_MSG("Q  : Quit");
+    TRACE_MSG("q  : Quit");
+    TRACE_MSG("==========================================");
+    TRACE_MSG("Input Key : ");
+}
+
+void display_factory_fw_menu(void)
+{
+    TRACE_MSG("==========================================");
+    TRACE_MSG("1  : Copy App Area to Factory Area");
+    TRACE_MSG("2  : Copy Factory Area to App Area");
+    TRACE_MSG("q  : Quit");
     TRACE_MSG("==========================================");
     TRACE_MSG("Input Key : ");
 }
@@ -107,5 +129,37 @@ void procedure_print_flash(void)
         {
             print_dump_data((uint8_t*)FLASH_TEMP_FW_START_ADDR, 0x100);
         }
+
+        display_print_flash_menu();
+    }
+}
+
+void procedure_factory_fw_(void)
+{
+    int ch;
+
+    display_factory_fw_menu();
+    while(1)
+    {
+        ch = getchar_timeout_us(1000);
+        if(ch < 0)
+        {
+            continue;
+        }
+
+        if(ch == KEY_VALUE_QUIT)
+        {
+            break;
+        }
+        else if(ch == KEY_VALUE_COPY_APP_AREA_TO_FACTORY_AREA)
+        {
+            copy_app_area_data_to_factory_area(APPLICATION_SIZE);
+        }
+        else if(ch == KEY_VALUE_COPY_FACTORY_AREA_TO_APP_AREA)
+        {
+            copy_factory_area_data_to_app_area(APPLICATION_SIZE);
+        }
+
+        display_factory_fw_menu();
     }
 }

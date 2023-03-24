@@ -6,16 +6,21 @@
 #include "w5x00_spi.h"
 #include "device_common.h"
 #include "dhcp.h"
+#include "led_control.h"
 
+#define LED_BLINK_TIME_MS   1000
 
 void idle_task(void *pParam)
 {
     bool dhcpStatus;
-    uint32_t refreshDhcpTimeStamp, currentTimeStamp;
+    uint32_t refreshDhcpTimeStamp, runStatusLedToggleTimeStamp, currentTimeStamp;
     uint32_t dhcpLeaseTimeS;
-    
+
     APP_COMMON_t *pAppCommon = (APP_COMMON_t *)pParam;
 
+    init_run_status_led();
+
+    runStatusLedToggleTimeStamp = get_time_ms();
     while(1)
     {
         currentTimeStamp = get_time_ms();
@@ -29,6 +34,13 @@ void idle_task(void *pParam)
         else
         {
             pAppCommon->isWizChipLinkUp = true;
+        }
+
+        // RUN LED TOGGLE
+        if( (currentTimeStamp - runStatusLedToggleTimeStamp) > LED_BLINK_TIME_MS )
+        {
+            toggle_run_status_led();
+            runStatusLedToggleTimeStamp = get_time_ms();
         }
 
         /////////////////////////////////////////////////////////////////////////////////////

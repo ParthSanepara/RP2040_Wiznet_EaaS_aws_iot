@@ -53,6 +53,7 @@ void print_flash_ota_binary                 (void);
 
 void copy_ota_area_data_to_app_area         (uint32_t dataSize);
 void copy_factory_area_data_to_app_area     (uint32_t dataSize);
+void copy_app_area_data_to_factory_area     (uint32_t dataSize);
 
 bool    check_flash_common_config_info_empty  (void);
 uint8_t* get_flash_ota_binary_start_address   (void);

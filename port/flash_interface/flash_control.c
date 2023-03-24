@@ -276,13 +276,43 @@ void copy_factory_area_data_to_app_area(uint32_t dataSize)
     }    
 }
 
+void copy_app_area_data_to_factory_area(uint32_t dataSize)
+{
+    uint32_t appAreaOffset, factoryAreaOffset, i=0;
+    uint16_t writePageCount = 0;
+    uint8_t  tempBuffer[USER_FLASH_PAGE_SIZE];
+    uint8_t *pAppAreaData = (uint8_t *)FLASH_APP_START_ADDR;
 
+    factoryAreaOffset = (FLASH_FACTORY_FW_START_ADDR - FLASH_START_ADDR);
+    appAreaOffset = 0;
+    
+    TRACE_DEBUG("Erase Factory Area Flash");
+    erase_flash_total_factory_area();
 
+    writePageCount = dataSize / USER_FLASH_PAGE_SIZE;
+    if( (dataSize % USER_FLASH_PAGE_SIZE) > 0 )
+    {
+        writePageCount++;
+    }
+
+    TRACE_DEBUG("Factory Area Offset : %08lX, Write Page Count : %d", factoryAreaOffset, writePageCount);
+    for(i=0; i<writePageCount; i++)
+    {
+        appAreaOffset = (i * USER_FLASH_PAGE_SIZE);
+        
+        memset(tempBuffer, 0x00, sizeof(tempBuffer));
+        memcpy(tempBuffer, (pAppAreaData + appAreaOffset), sizeof(tempBuffer));
+    
+        critical_section_enter_blocking(&g_flash_cri_sec);
+        flash_range_program(factoryAreaOffset, (uint8_t *)tempBuffer, USER_FLASH_PAGE_SIZE);
+        critical_section_exit(&g_flash_cri_sec);    
+
+        factoryAreaOffset += USER_FLASH_PAGE_SIZE;
+    }   
+}
 
 uint8_t* get_flash_ota_binary_start_address(void)
 {
     return (uint8_t *)FLASH_TEMP_FW_START_ADDR;
 }
-
-
 

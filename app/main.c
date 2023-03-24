@@ -22,8 +22,8 @@
  */
 /* Task Priority */
 #define IDLE_TASK_PRIORITY      3
-#define MAIN_TASK_PRIORITY      (IDLE_TASK_PRIORITY - 1)
-#define IOT_JOBS_TASK_PRIORITY  4
+#define MAIN_TASK_PRIORITY      3
+#define IOT_JOBS_TASK_PRIORITY  3
 
 
 /* Clock */

@@ -89,10 +89,13 @@ int main()
             procedure_print_flash();
             startTimeoutMs = get_time_ms();
         }
-       
-        
-        
-        
+        else if(ch == KEY_VALUE_FACTORY_FW_MENU)
+        {
+            procedure_factory_fw_();
+            startTimeoutMs = get_time_ms();
+        }
+
+        display_menu();
     }
 
     TRACE_MSG("");
