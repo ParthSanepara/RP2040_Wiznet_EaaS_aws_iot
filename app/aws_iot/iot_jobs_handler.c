@@ -43,10 +43,10 @@ uint8_t g_aws_mqtt_iot_jobs_pub_msg_buf[1024] = { 0, };
 
 void iot_jobs_event_callback(MQTTContext_t *pContext, MQTTPacketInfo_t *pPacketInfo, MQTTDeserializedInfo_t *pDeserializedInfo)
 {
-    uint8_t temp_topic[MAX_MQTT_TOPIC_SIZE];
-    uint8_t temp_job_id[MAX_AWS_JOB_ID_SIZE];
-    uint8_t temp_job_type[MAX_AWS_JOB_TYPE_SIZE];
-    uint8_t temp_job_documet[MAX_AWS_JOB_DOCUMENT_SIZE];
+    uint8_t temp_topic[MAX_MQTT_TOPIC_SIZE]={0,};
+    uint8_t temp_job_id[MAX_AWS_JOB_ID_SIZE]={0,};
+    uint8_t temp_job_type[MAX_AWS_JOB_TYPE_SIZE]={0,};
+    uint8_t temp_job_documet[MAX_AWS_JOB_DOCUMENT_SIZE]={0,};
     uint16_t temp_str_length=0;
     bool retStatus = false;
 
@@ -202,7 +202,7 @@ bool iot_jobs_get_procedure (DEVICE_INFO_t *pDeviceInfo)
 bool iot_jobs_start_job_document_procedure (APP_COMMON_t *pAppCommon)
 {
     bool retStatus = false;
-    uint8_t tempJobId[MAX_AWS_JOB_ID_SIZE];    
+    uint8_t tempJobId[MAX_AWS_JOB_ID_SIZE]={0,};    
     uint16_t tempJobIdLength;
 
     pAppCommon->enableReboot = false;
