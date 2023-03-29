@@ -80,6 +80,16 @@ void set_default_device_info(DEVICE_INFO_t *pDevieInfo)
     strncpy(pDevieInfo->AWS_TEMPLATE_NAME, DEFAULT_AWS_TEMPLATE_NAME, strlen(DEFAULT_AWS_TEMPLATE_NAME));
 }
 
+void clearAppFlags(APP_COMMON_t *pAppCommonInfo)
+{
+    pAppCommonInfo->isDhcpDone = false;
+    pAppCommonInfo->isRunAwsIotJobs = false;
+    pAppCommonInfo->isValidClaimCertInfo = false;
+    pAppCommonInfo->isValidProvisionedCertInfo = false;
+    pAppCommonInfo->isWizChipLinkUp = false;
+}
+
+
 
 /**
  * ----------------------------------------------------------------------------------------------------
@@ -110,6 +120,9 @@ int main()
     {
         load_flash_common_config_info(&appCommon);
     }
+
+    clearAppFlags(&appCommon);
+    init_ethernet(&appCommon.DEVICE_INFO.ETH_NET_INFO);
 
     xTaskCreate(main_app_task,      "MAIN_TASK",        (50 * 256), &appCommon, MAIN_TASK_PRIORITY, NULL);
     xTaskCreate(aws_iot_jobs_task,  "IoT_JOBS_TASK",    (50 * 256), &appCommon, IOT_JOBS_TASK_PRIORITY, NULL);

@@ -14,9 +14,6 @@ void main_app_task(void *pParam)
     AWS_FP_DEVICE_CERT_INFO_t provisonedCertInfo;
     bool retStatus;
 
-
-    init_ethernet(&pAppCommon->DEVICE_INFO.ETH_NET_INFO);
-
     do{
         OS_DELAY_MS(1000);
     }while(pAppCommon->isWizChipLinkUp == false || pAppCommon->isDhcpDone == false);

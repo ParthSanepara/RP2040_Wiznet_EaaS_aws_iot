@@ -50,13 +50,10 @@ target_include_directories(${TARGET_NAME} PUBLIC
     ${WIZNET_DIR}/Internet/DHCP
     ${WIZNET_DIR}/Internet/DNS
 
-    ${PICO_SDK_DIR}/src/rp2_common/cmsis/stub/CMSIS/Device/RaspberryPi/RP2040/Include
-
     ${MBEDTLS_DIR}/include
 )
 
 target_link_libraries(${TARGET_NAME} PRIVATE
-    cmsis_core
     pico_stdlib
     hardware_clocks
     hardware_flash
@@ -129,13 +126,11 @@ target_include_directories(${TARGET_NAME_LINKER} PUBLIC
     ${WIZNET_DIR}/Internet/DHCP
     ${WIZNET_DIR}/Internet/DNS
 
-    ${PICO_SDK_DIR}/src/rp2_common/cmsis/stub/CMSIS/Device/RaspberryPi/RP2040/Include
 
     ${MBEDTLS_DIR}/include
 )
 
 target_link_libraries(${TARGET_NAME_LINKER} PRIVATE
-    cmsis_core
     pico_stdlib
     hardware_clocks
     hardware_flash

@@ -3,7 +3,7 @@
 #include "port_common.h"
 #include "hardware/clocks.h"
 #include "flash_control.h"
-#include "system_common.h"
+#include "system_common_for_nonos.h"
 #include "test_menu.h"
 
 #define JUMP_APP_TIMEOUT_MS             2000

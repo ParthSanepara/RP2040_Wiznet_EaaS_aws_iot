@@ -5,7 +5,7 @@ add_executable(${TARGET_NAME}
     ${BOOT_DIR}/test_menu.c
 
     ${PORT_DIR}/device_common/device_common.c
-    ${PORT_DIR}/device_common/system_common.c
+    ${PORT_DIR}/device_common/system_common_for_nonos.c
     ${PORT_DIR}/device_common/logger.c
 
     ${PORT_DIR}/flash_interface/flash_control.c
@@ -41,7 +41,7 @@ add_executable(${TARGET_NAME_LINKER}
     ${BOOT_DIR}/test_menu.c
 
     ${PORT_DIR}/device_common/device_common.c
-    ${PORT_DIR}/device_common/system_common.c
+    ${PORT_DIR}/device_common/system_common_for_nonos.c
     ${PORT_DIR}/device_common/logger.c
 
     ${PORT_DIR}/flash_interface/flash_control.c
