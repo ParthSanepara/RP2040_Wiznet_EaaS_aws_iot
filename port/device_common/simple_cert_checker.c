@@ -1,25 +1,19 @@
 #include "simple_cert_checker.h"
-
-
-#define BEGIN_CERTIFICATE_STR   "-----BEGIN CERTIFICATE-----"
-#define END_CERTIFICATE_STR     "-----END CERTIFICATE-----"
-
-#define BEGIN_PRIVATE_KEY_STR   "-----BEGIN RSA PRIVATE KEY-----"
-#define END_PRIVATE_KEY_STR     "-----END RSA PRIVATE KEY-----"
+#include "mbedtls/x509_crt.h"
+#include "logger.h"
 
 bool is_valid_pem_certificate(uint8_t *pCertPemData)
 {
-    uint8_t *ptr;
+    int resultCode, certLength=0;
+    mbedtls_x509_crt certificate;
 
-    ptr = strstr(pCertPemData, BEGIN_CERTIFICATE_STR);
-    if(ptr == NULL)
-    {
-        return false;
-    }
+    mbedtls_x509_crt_init(&certificate);
 
-    ptr = strstr(pCertPemData, END_CERTIFICATE_STR);
-    if(ptr == NULL)
+    certLength = strlen(pCertPemData) + 1;
+    resultCode = mbedtls_x509_crt_parse(&certificate, (const unsigned char *)pCertPemData, certLength);
+    if(resultCode < 0)
     {
+        TRACE_ERROR("Failed. mbedtls_x509_crt_parse -0x%x\r\n", -resultCode);
         return false;
     }
 
@@ -28,17 +22,15 @@ bool is_valid_pem_certificate(uint8_t *pCertPemData)
 
 bool is_valid_pem_private_key(uint8_t *pPrivateKeyPemData)
 {
-    uint8_t *ptr;
+    mbedtls_pk_context privateKey;
+    int resultCode, privateKeyLength = 0;
 
-    ptr = strstr(pPrivateKeyPemData, BEGIN_PRIVATE_KEY_STR);
-    if(ptr == NULL)
+    privateKeyLength = strlen(pPrivateKeyPemData) + 1;
+    
+    resultCode = mbedtls_pk_parse_key(&privateKey, (const unsigned char *)pPrivateKeyPemData, privateKeyLength, NULL, 0);
+    if(resultCode < 0)
     {
-        return false;
-    }
-
-    ptr = strstr(pPrivateKeyPemData, END_PRIVATE_KEY_STR);
-    if(ptr == NULL)
-    {
+        TRACE_ERROR("Failed. mbedtls_pk_parse_key -0x%x\r\n", -resultCode);
         return false;
     }
 

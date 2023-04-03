@@ -7,6 +7,6 @@
 int32_t ota_http_send_request_callback  (TransportInterface_t *pTransportInterface, char *pMethod, http_config_t *http_config);
 
 bool ota_procedure          (uint8_t *pDownloadUrl, uint32_t fwSize, uint16_t fwCrc);
-bool ota_download_firmware  (uint8_t *pUrl, uint32_t fwSize, uint16_t fwCrc);
+bool ota_download_firmware  (uint8_t *pUrl, uint32_t fwSize, uint16_t fwCrc, uint8_t *pLogMsg);
 
 #endif

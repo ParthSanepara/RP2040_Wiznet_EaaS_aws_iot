@@ -22,13 +22,16 @@
 #define AWS_PUB_TOPIC_JOBS_UPDATE               "$aws/things/%s/jobs/%s/update"             // (THING NAME, JOB ID)
 
 #define AWS_JOBS_UPDATE_PARAMETERS              "{\r\n"                        \
-                                                "   \"status\" : \"%s\" \r\n"  \
+                                                "   \"status\" : \"%s\", \r\n" \
+                                                "   \"logs\"   : \"%s\" \r\n"  \
                                                 "}"
 
 
+#define MAX_JOBS_DOCUMNET_LOG_SIZE  512
 
 tlsContext_t                g_iot_jobs_mqtt_tls_context;
 AWS_JOBS_EXECUTION_PARAMS_t g_iot_jobs_execution_param;
+uint8_t                     g_iot_jobs_document_process_log[MAX_JOBS_DOCUMNET_LOG_SIZE];
 
 volatile uint8_t *p_aws_thing_name_for_event_callback;
 volatile uint8_t *p_aws_job_id_for_event_callback;
@@ -241,7 +244,8 @@ bool iot_jobs_start_job_document_procedure (APP_COMMON_t *pAppCommon)
 
         g_iot_jobs_execution_param.IS_JOB_STARTED = false;
 
-        retStatus = iot_jobs_update_job_status_procedure(&pAppCommon->DEVICE_INFO, g_iot_jobs_execution_param.JOB_ID, JOBS_API_STATUS_FAILED);
+        retStatus = iot_jobs_update_job_status_procedure(   &pAppCommon->DEVICE_INFO, g_iot_jobs_execution_param.JOB_ID, 
+                                                            JOBS_API_STATUS_FAILED, g_iot_jobs_document_process_log );
         if(retStatus == true)
         {
             del_first_job_id();
@@ -251,7 +255,8 @@ bool iot_jobs_start_job_document_procedure (APP_COMMON_t *pAppCommon)
 
     g_iot_jobs_execution_param.IS_JOB_STARTED = false;
 
-    retStatus = iot_jobs_update_job_status_procedure(&pAppCommon->DEVICE_INFO, g_iot_jobs_execution_param.JOB_ID, JOBS_API_STATUS_SUCCEEDED);
+    retStatus = iot_jobs_update_job_status_procedure(   &pAppCommon->DEVICE_INFO, g_iot_jobs_execution_param.JOB_ID, 
+                                                        JOBS_API_STATUS_SUCCEEDED, g_iot_jobs_document_process_log );
     if(retStatus == true)
     {
         del_first_job_id();
@@ -271,11 +276,15 @@ bool iot_jobs_start_job_document_procedure (APP_COMMON_t *pAppCommon)
 bool start_job_document(APP_COMMON_t *pAppCommon, AWS_JOBS_EXECUTION_PARAMS_t *pJobExecutionParam)
 {
     bool retStatus;
+    uint8_t tempLogMsg[MAX_JOBS_DOCUMNET_LOG_SIZE]={0,};
 
     size_t jobDocumentLength = 0;
     APP_COMMON_t  tempAppCommonInfo;
 
     jobDocumentLength = strlen(pJobExecutionParam->JOB_DOCUMENT);
+
+    // JOB Document 수행 결과를 서버에 전달하기 위한 log 변수 초기화
+    memset(&g_iot_jobs_document_process_log, 0x00, sizeof(g_iot_jobs_document_process_log));
 
     // JOB TYPE이 OTA면 아래 수행
     if( strncmp( pJobExecutionParam->JOB_TYPE, AWS_JOB_TYPE_OTA, sizeof(AWS_JOB_TYPE_OTA)) == 0 )
@@ -291,10 +300,30 @@ bool start_job_document(APP_COMMON_t *pAppCommon, AWS_JOBS_EXECUTION_PARAMS_t *p
         if(retStatus == false)
         {
             TRACE_ERROR("Fail to parsing ota job params");
+            strncpy(tempLogMsg, "Fail to parsing ota job params", strlen("Fail to parsing ota job params"));
+            strncpy(g_iot_jobs_document_process_log, tempLogMsg, strlen(tempLogMsg));
+            
             return false;
         }
 
-        retStatus = ota_download_firmware(pJobExecutionParam->JOB_OTA.FIRMWARE_URL, pJobExecutionParam->JOB_OTA.FIRMWARE_SIZE, pJobExecutionParam->JOB_OTA.FIRMWARE_CRC);
+        retStatus = is_upper_version_fw(pJobExecutionParam->JOB_OTA.FIRMWARE_VERSION);
+        if(retStatus == false)
+        {
+            TRACE_ERROR("Invalid Firmware Version");
+            sprintf(tempLogMsg, "Invalid Firmware Version. Current Version : %d.%d.%d, Update Version : %s",APPLICATION_VERSION_MAJOR, 
+                                                                                                            APPLICATION_VERSION_MINOR, 
+                                                                                                            APPLICATION_VERSION_PATCH,
+                                                                                                            pJobExecutionParam->JOB_OTA.FIRMWARE_VERSION);
+            TRACE_DEBUG("%s",tempLogMsg);
+            strncpy(g_iot_jobs_document_process_log, tempLogMsg, strlen(tempLogMsg));
+            return false;
+        }
+        
+        retStatus = ota_download_firmware(  pJobExecutionParam->JOB_OTA.FIRMWARE_URL, 
+                                            pJobExecutionParam->JOB_OTA.FIRMWARE_SIZE, 
+                                            pJobExecutionParam->JOB_OTA.FIRMWARE_CRC,
+                                            g_iot_jobs_document_process_log
+                                            );
         if(retStatus == false)
         {
             TRACE_ERROR("Fail to download firmware");
@@ -352,7 +381,7 @@ bool iot_jobs_start_next_procedure(DEVICE_INFO_t *pDeviceInfo)
     return true;
 }
 
-bool iot_jobs_update_job_status_procedure(DEVICE_INFO_t *pDeviceInfo, uint8_t *pJobId, uint8_t *pJobStatus)
+bool iot_jobs_update_job_status_procedure(DEVICE_INFO_t *pDeviceInfo, uint8_t *pJobId, uint8_t *pJobStatus, uint8_t *pJobStatusLogMsg)
 {
     bool retStatus = false;
     uint8_t topic[MAX_MQTT_TOPIC_SIZE];
@@ -364,7 +393,10 @@ bool iot_jobs_update_job_status_procedure(DEVICE_INFO_t *pDeviceInfo, uint8_t *p
     memset(g_aws_mqtt_iot_jobs_pub_msg_buf, 0x00, sizeof(g_aws_mqtt_iot_jobs_pub_msg_buf));
     
     sprintf(topic, AWS_PUB_TOPIC_JOBS_UPDATE, pDeviceInfo->THING_NAME, pJobId);
-    sprintf(g_aws_mqtt_iot_jobs_pub_msg_buf, AWS_JOBS_UPDATE_PARAMETERS, pJobStatus);
+    sprintf(g_aws_mqtt_iot_jobs_pub_msg_buf, AWS_JOBS_UPDATE_PARAMETERS, pJobStatus, pJobStatusLogMsg);
+
+    TRACE_DEBUG("Publish JOBS Update Topic. Topic : %s", topic);
+    TRACE_DEBUG("Data : %s", g_aws_mqtt_iot_jobs_pub_msg_buf);
 
     if( mqtt_transport_publish(topic, g_aws_mqtt_iot_jobs_pub_msg_buf, strlen(g_aws_mqtt_iot_jobs_pub_msg_buf), qos) == -1)
     {
@@ -812,4 +844,9 @@ bool parsing_ota_job_params (uint8_t *pPayload, uint16_t payloadLength,
     // TRACE_DEBUG("FwCrc : %0xX",*pFwCrc);
 
     return true;
+}
+
+uint8_t *get_iot_jobs_document_process_log_msg(void)
+{
+    return g_aws_mqtt_iot_jobs_pub_msg_buf;
 }

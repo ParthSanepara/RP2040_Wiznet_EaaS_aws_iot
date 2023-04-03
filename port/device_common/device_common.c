@@ -195,3 +195,48 @@ uint8_t is_ipaddr(uint8_t *ipaddr, uint8_t *ret_ip)
 
     return 1;
 }
+
+uint16_t get_char_count(uint8_t *pString, uint8_t wantedChar)
+{
+    uint16_t i, stringLength=0;
+    uint16_t foundedCount=0;
+
+    stringLength = strlen((const char*)pString);
+    for(i=0; i<stringLength; i++)
+    {
+        if( pString[i] == wantedChar )
+        {
+            foundedCount++;
+        }
+    }
+
+    return foundedCount;
+}
+
+
+// FW 버전 정보는 1.0.0과 같이 MAJOR.MINOR.PATH 규칙으로 사용한다는 가정하에 아래 함수 수행
+bool is_upper_version_fw(uint8_t *pFwVersion)
+{
+    int major=0, minor=0, patch=0;
+    uint16_t foundedCharCount=0;
+
+    // FW 버전 규칙 Validation 검사
+    foundedCharCount = get_char_count(pFwVersion, '.');
+    if(foundedCharCount != 2)
+    {
+        TRACE_ERROR("Invalid FW Version Format. %s", pFwVersion);
+        return false;
+    }
+
+    sscanf((const char*)pFwVersion, "%d.%d.%d", &major, &minor, &patch);
+    TRACE_DEBUG("%d.%d.%d", major, minor, patch);
+
+    if(major < APPLICATION_VERSION_MAJOR || minor < APPLICATION_VERSION_MINOR || patch < APPLICATION_VERSION_PATCH )
+    {
+        TRACE_ERROR("Is not upper version FW. Current Version: %d.%d.%d, Update Version: %s", APPLICATION_VERSION_MAJOR, APPLICATION_VERSION_MINOR, 
+                                                                                              APPLICATION_VERSION_PATCH, pFwVersion);
+        return false;
+    }
+
+    return true;
+}

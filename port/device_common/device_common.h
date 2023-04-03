@@ -57,6 +57,9 @@ uint32_t    hex_string_to_int   (uint8_t *pHexString);
 
 uint8_t     is_ipaddr           (uint8_t *ipaddr, uint8_t *ret_ip);
 
+uint16_t    get_char_count      (uint8_t *pString, uint8_t wantedChar);
+bool        is_upper_version_fw (uint8_t *pFwVersion);
+
 
 
 #endif

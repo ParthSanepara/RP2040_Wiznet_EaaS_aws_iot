@@ -212,7 +212,7 @@ int32_t ota_http_send_request_callback(TransportInterface_t *pTransportInterface
     return returnStatus;
 }
 
-bool ota_download_firmware(uint8_t *pUrl, uint32_t fwSize, uint16_t fwCrc)
+bool ota_download_firmware(uint8_t *pUrl, uint32_t fwSize, uint16_t fwCrc, uint8_t *pLogMsg)
 {
     uint8_t *pOtaBinFlashStartAddress;
     uint16_t calcedCrc=0;
@@ -232,12 +232,14 @@ bool ota_download_firmware(uint8_t *pUrl, uint32_t fwSize, uint16_t fwCrc)
 
     if( retHttpResult == -1 )
     {
-        TRACE_ERROR("Fail to http get.");
+        TRACE_ERROR("Fail to http get");
+        strncpy(pLogMsg, "Fail to http get", strlen("Fail to http get"));
         return false;
     }
     else if( retHttpResult == -2 )
     {
         TRACE_WARN("There is no binary data");
+        strncpy(pLogMsg, "There is no binary data", strlen("There is no binary data"));
         return false;
     }
 
@@ -253,9 +255,11 @@ bool ota_download_firmware(uint8_t *pUrl, uint32_t fwSize, uint16_t fwCrc)
     if(calcedCrc != fwCrc)
     {
         TRACE_DEBUG("Invalid CRC");
+        strncpy(pLogMsg, "Invalid CRC", strlen("Invalid CRC"));
         return false;
     }
     
+    strncpy(pLogMsg, "Success to download firmware", strlen("Success to download firmware"));
     return true;;
 }
 
